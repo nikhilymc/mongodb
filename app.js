@@ -1,24 +1,34 @@
 const express=require('express');
 const chalk=require('chalk');
 const path=require('path');
-const booksRouter=express.Router();
 
+const authorsRouter=express.Router();
 var app=express();
+
 app.set('views','./src/views');
 app.set('view engine','ejs');
 app.use(express.static(path.join(__dirname,"/public")))
-app.use('/books',booksRouter);
 
+app.use('/authors',authorsRouter);
+const nav=[
+    {link:'/books',title:'books'},
+    {link:'/authors',title:'Authors'},
+    {link:'/addbook',title:'Admin'}
+];
+const booksRouter=require('./src/routes/bookRoutes')(nav);
+const adminRouter=require('./src/routes/adminRoutes')(nav);
+app.use('/books',booksRouter);
+app.use('/addbook',adminRouter);
 app.get('/',(req,res)=>{
     res.render("index",{
-        nav:[
-            {link:'/books',title:'books'},
-            {link:'/authors',title:'Authors'}],
-        title:'library'});
+       nav,
+             title:'library'
+            }
+            );
 });
-booksRouter.route('/').get((req,res)=>{
-    res.send("hello books");
-});
+
+
+
 
 app.listen(3000,function(){
 
